@@ -51,3 +51,6 @@ bin/
 *.db
 *.mv.db
 *.trace.db
+.env
+.env
+/src/test/java/ee/zhan
