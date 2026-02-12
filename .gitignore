@@ -53,4 +53,4 @@ bin/
 *.trace.db
 .env
 .env
-/src/test/java/ee/zhan
+/htmlReport
