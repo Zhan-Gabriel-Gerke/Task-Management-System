@@ -1,7 +1,7 @@
 package ee.zhan.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ee.zhan.dto.RegistrationRequest;
+import ee.zhan.dto.Auth.RegistrationRequest;
 import ee.zhan.security.SecurityConfig;
 import ee.zhan.service.AppUserDetailsServiceImpl;
 import ee.zhan.service.AuthService;

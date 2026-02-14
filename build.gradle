@@ -16,6 +16,12 @@ java {
 repositories {
     mavenCentral()
 }
+
+ext {
+    mapstructVersion = '1.5.5.Final'
+    lombokBindingVersion = '0.2.0'
+}
+
 dependencies {
     // WEB & CORE
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -29,15 +35,20 @@ dependencies {
     implementation 'org.postgresql:postgresql'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    //UTILS
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
     // MIGRATION
-    implementation 'org.flywaydb:flyway-core'
-    implementation 'org.flywaydb:flyway-database-postgresql'
+    //implementation 'org.flywaydb:flyway-core'
+    //implementation 'org.flywaydb:flyway-database-postgresql'
 
-    //TESTS
+    // UTILS & MAPPER
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    compileOnly 'org.projectlombok:lombok'
+
+    // ПОРЯДОК ПРОЦЕССОРОВ СТРОГО ТАКОЙ:
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokBindingVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+    // TESTS
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
@@ -49,4 +60,5 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
 }

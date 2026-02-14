@@ -1,10 +1,12 @@
-package ee.zhan.service;
+package ee.zhan.service.Auth;
 
 import ee.zhan.AbstractIntegrationTest;
-import ee.zhan.dto.RegistrationRequest;
-import ee.zhan.entity.AppUser;
-import ee.zhan.exception.EmailAlreadyExists;
+import ee.zhan.dto.Auth.RegistrationRequest;
+import ee.zhan.entity.AppUserEntity;
+import ee.zhan.exception.Auth.EmailAlreadyExists;
 import ee.zhan.repository.AppUserRepository;
+import ee.zhan.repository.TaskRepository;
+import ee.zhan.service.AuthService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,20 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
-
 public class AuthServiceIntegrationTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private AuthService authService;
-
-    @Autowired
-    private AppUserRepository userRepository;
-
-    @BeforeEach
-    void setUp() {
-        userRepository.deleteAll();
-    }
+    @Autowired private AuthService authService;
+    @Autowired private AppUserRepository userRepository;
 
     @Test
     void shouldRegisterUserInRealDatabase() {
@@ -35,7 +27,7 @@ public class AuthServiceIntegrationTest extends AbstractIntegrationTest {
 
         authService.register(request);
 
-        Optional<AppUser> savedUser = userRepository.findAppUserByEmail("some_cool_email@gmail.com");
+        Optional<AppUserEntity> savedUser = userRepository.findByEmail("some_cool_email@gmail.com");
 
         Assertions.assertTrue(savedUser.isPresent());
         Assertions.assertEquals("some_cool_email@gmail.com", savedUser.get().getEmail());
@@ -45,7 +37,7 @@ public class AuthServiceIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void shouldFailWhenDuplicateEmailExistsInDb() {
-        var user = new AppUser();
+        var user = new AppUserEntity();
         user.setEmail("duplicate@test.com");
         user.setPassword("Password123456!");
         userRepository.save(user);

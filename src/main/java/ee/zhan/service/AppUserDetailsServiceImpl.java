@@ -1,10 +1,10 @@
 package ee.zhan.service;
 
+import ee.zhan.entity.AppUserEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ee.zhan.entity.AppUser;
 import ee.zhan.repository.AppUserRepository;
 import ee.zhan.security.AppUserAdapter;
 import ee.zhan.util.AuthUtils;
@@ -20,8 +20,8 @@ public class AppUserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         String normalizedEmail = AuthUtils.normalizeEmail(username);
-        AppUser user = repository
-                .findAppUserByEmail(normalizedEmail)
+        AppUserEntity user = repository
+                .findByEmail(normalizedEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
         return new AppUserAdapter(user);

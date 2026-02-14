@@ -1,11 +1,14 @@
 package ee.zhan.repository;
 
-import org.springframework.data.repository.CrudRepository;
-import ee.zhan.entity.AppUser;
+import ee.zhan.entity.AppUserEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface AppUserRepository extends CrudRepository<AppUser, Integer> {
-    Optional<AppUser> findAppUserByEmail(String email);
-    boolean existsAppUsersByEmail(String email);
+public interface AppUserRepository extends JpaRepository<AppUserEntity, Long> {
+    Optional<AppUserEntity> findByEmail(String email);
+    boolean existsByEmail(String email);
+    Optional<AppUserEntity> findById(Long userId);
+    boolean existsById(Long userId);
+
 }

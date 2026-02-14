@@ -1,4 +1,4 @@
-package ee.zhan.dto;
+package ee.zhan.dto.Auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

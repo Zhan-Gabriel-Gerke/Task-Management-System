@@ -1,5 +1,6 @@
-package ee.zhan.exception;
+package ee.zhan.exception.Auth;
 
+import ee.zhan.exception.AppException;
 import org.springframework.http.HttpStatus;
 
 public class EmailAlreadyExists extends AppException {

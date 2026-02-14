@@ -1,6 +1,5 @@
-package ee.zhan.dto;
+package ee.zhan.dto.Auth;
 
-import jakarta.validation.Valid;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;

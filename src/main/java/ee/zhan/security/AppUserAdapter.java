@@ -1,16 +1,16 @@
 package ee.zhan.security;
 
+import ee.zhan.entity.AppUserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ee.zhan.entity.AppUser;
 
 import java.util.Collection;
 import java.util.Collections;
 
 public class AppUserAdapter implements UserDetails {
-    private final AppUser user;
+    private final AppUserEntity user;
 
-    public AppUserAdapter(AppUser user) {
+    public AppUserAdapter(AppUserEntity user) {
         this.user = user;
     }
 
@@ -18,6 +18,10 @@ public class AppUserAdapter implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
+    }
+
+    public Long getId() {
+        return user.getId();
     }
 
     @Override

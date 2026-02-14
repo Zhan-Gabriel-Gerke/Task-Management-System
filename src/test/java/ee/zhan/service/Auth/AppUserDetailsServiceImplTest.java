@@ -1,15 +1,14 @@
-package ee.zhan.service;
+package ee.zhan.service.Auth;
 
-import ee.zhan.entity.AppUser;
+import ee.zhan.entity.AppUserEntity;
 import ee.zhan.repository.AppUserRepository;
-import ee.zhan.security.AppUserAdapter;
+import ee.zhan.service.AppUserDetailsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -31,11 +30,11 @@ class AppUserDetailsServiceImplTest {
         String rawInputEmail = "  ZhAn@GmAiL.cOm  ";
         String expectedNormalizedEmail = "zhan@gmail.com";
 
-        var user = new AppUser();
+        var user = new AppUserEntity();
         user.setEmail(expectedNormalizedEmail);
         user.setPassword("passsworD12345!!!!");
 
-        Mockito.when(repository.findAppUserByEmail(expectedNormalizedEmail))
+        Mockito.when(repository.findByEmail(expectedNormalizedEmail))
                 .thenReturn(Optional.of(user));
 
         UserDetails actualResult = service.loadUserByUsername(rawInputEmail);
@@ -43,13 +42,13 @@ class AppUserDetailsServiceImplTest {
 
         assertNotNull(actualResult);
         assertEquals(expectedNormalizedEmail, actualResult.getUsername());
-        Mockito.verify(repository).findAppUserByEmail(expectedNormalizedEmail);
+        Mockito.verify(repository).findByEmail(expectedNormalizedEmail);
     }
 
     @Test
     void shouldThrowException_WhenUserNotFound() {
         String email = "email@gmail.com";
-        Mockito.when(repository.findAppUserByEmail(email)).thenReturn(Optional.empty());
+        Mockito.when(repository.findByEmail(email)).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () -> {
             service.loadUserByUsername(email);

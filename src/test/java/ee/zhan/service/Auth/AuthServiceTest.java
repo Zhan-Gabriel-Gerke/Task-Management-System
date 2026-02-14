@@ -1,9 +1,10 @@
-package ee.zhan.service;
+package ee.zhan.service.Auth;
 
-import ee.zhan.dto.RegistrationRequest;
-import ee.zhan.entity.AppUser;
-import ee.zhan.exception.EmailAlreadyExists;
+import ee.zhan.dto.Auth.RegistrationRequest;
+import ee.zhan.entity.AppUserEntity;
+import ee.zhan.exception.Auth.EmailAlreadyExists;
 import ee.zhan.repository.AppUserRepository;
+import ee.zhan.service.AuthService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ public class AuthServiceTest {
     private AuthService service;
 
     @Captor
-    private ArgumentCaptor<AppUser> userCaptor;
+    private ArgumentCaptor<AppUserEntity> userCaptor;
 
     private RegistrationRequest request;
 
@@ -38,7 +39,7 @@ public class AuthServiceTest {
     @Test
     void shouldRegister_whenGivenValidData() {
         //Given
-        Mockito.when(repository.existsAppUsersByEmail("zhan@gmail.com")).thenReturn(Boolean.FALSE);
+        Mockito.when(repository.existsByEmail("zhan@gmail.com")).thenReturn(Boolean.FALSE);
         Mockito.when(passwordEncoder.encode(Mockito.any())).thenReturn("encoded_password");
 
         //When
@@ -46,7 +47,7 @@ public class AuthServiceTest {
 
         //Then
         Mockito.verify(repository).save(userCaptor.capture());
-        AppUser capturedUser = userCaptor.getValue();
+        AppUserEntity capturedUser = userCaptor.getValue();
 
         //Check
         Assertions.assertEquals("zhan@gmail.com", capturedUser.getEmail());
@@ -55,8 +56,8 @@ public class AuthServiceTest {
 
     @Test
     void shouldNotRegister_whenGivenInValidData() {
-        Mockito.when(repository.existsAppUsersByEmail("zhan@gmail.com")).thenReturn(Boolean.FALSE);
-        Mockito.when(repository.save(Mockito.any(AppUser.class)))
+        Mockito.when(repository.existsByEmail("zhan@gmail.com")).thenReturn(Boolean.FALSE);
+        Mockito.when(repository.save(Mockito.any(AppUserEntity.class)))
                 .thenThrow(DataIntegrityViolationException.class);
 
         Assertions.assertThrows(EmailAlreadyExists.class, () -> {
@@ -66,7 +67,7 @@ public class AuthServiceTest {
 
     @Test
     void shouldNotRegister_whenGivenInValidEmail() {
-        Mockito.when(repository.existsAppUsersByEmail("zhan@gmail.com")).thenReturn(Boolean.TRUE);
+        Mockito.when(repository.existsByEmail("zhan@gmail.com")).thenReturn(Boolean.TRUE);
 
         Assertions.assertThrows(EmailAlreadyExists.class, () -> {
             service.register(request);

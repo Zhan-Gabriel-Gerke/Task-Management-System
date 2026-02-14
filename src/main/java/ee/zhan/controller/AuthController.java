@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ee.zhan.dto.RegistrationRequest;
+import ee.zhan.dto.Auth.RegistrationRequest;
 import ee.zhan.service.AuthService;
 
 @RestController
