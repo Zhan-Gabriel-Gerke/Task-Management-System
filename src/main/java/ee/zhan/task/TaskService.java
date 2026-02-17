@@ -7,6 +7,8 @@ import ee.zhan.task.mapper.TaskEntityMapper;
 import ee.zhan.task.mapper.TaskSummaryMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -31,5 +33,10 @@ public class TaskService {
             throw new TaskNotFoundException();
         }
         return taskSummaryMapper.toSummaryResponse(entity.get());
+    }
+
+    public Page<TaskSummaryResponse> getByOptionalEmail(String email, Pageable pageable) {
+        Page<TaskEntity> repositoryRespond = repository.findByOptionalEmail(email, pageable);
+        return repositoryRespond.map(entity -> taskSummaryMapper.toSummaryResponse(entity));
     }
 }

@@ -23,6 +23,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/tasks").authenticated()
+                        .requestMatchers(HttpMethod.GET, "api/tasks").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/tasks/*").authenticated()
                         .anyRequest().denyAll()
                 )
