@@ -3,7 +3,7 @@ package ee.zhan.task;
 import ee.zhan.common.AbstractIntegrationTest;
 import ee.zhan.task.dto.CreateTaskRequest;
 import ee.zhan.task.dto.TaskSummaryResponse;
-import ee.zhan.user.AppUserAdapter;
+import ee.zhan.common.security.AppUserAdapter;
 import ee.zhan.user.AppUserEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

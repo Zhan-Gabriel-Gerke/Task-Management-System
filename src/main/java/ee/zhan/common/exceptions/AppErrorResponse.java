@@ -1,4 +1,4 @@
-package ee.zhan.common.security.exception;
+package ee.zhan.common.exceptions;
 
 import java.time.LocalDateTime;
 

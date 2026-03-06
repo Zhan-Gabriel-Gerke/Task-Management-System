@@ -1,6 +1,6 @@
 package ee.zhan.task.exception;
 
-import ee.zhan.common.security.exception.AppException;
+import ee.zhan.common.exceptions.AppException;
 import org.springframework.http.HttpStatus;
 
 public class TaskNotFoundException extends AppException {

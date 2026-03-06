@@ -3,7 +3,7 @@ package ee.zhan.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.zhan.auth.dto.RegistrationRequest;
 import ee.zhan.common.security.SecurityConfig;
-import ee.zhan.user.AppUserDetailsServiceImpl;
+import ee.zhan.common.security.AppUserDetailsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

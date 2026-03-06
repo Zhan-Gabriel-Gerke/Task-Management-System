@@ -1,4 +1,4 @@
-package ee.zhan.common.security.exception;
+package ee.zhan.common.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;

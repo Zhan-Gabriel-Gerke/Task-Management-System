@@ -2,7 +2,7 @@ package ee.zhan.task.mapper;
 
 import ee.zhan.task.dto.CreateTaskCommand;
 import ee.zhan.task.dto.CreateTaskRequest;
-import ee.zhan.user.AppUserAdapter;
+import ee.zhan.common.security.AppUserAdapter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

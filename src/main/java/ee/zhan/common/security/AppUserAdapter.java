@@ -1,5 +1,6 @@
-package ee.zhan.user;
+package ee.zhan.common.security;
 
+import ee.zhan.user.AppUserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

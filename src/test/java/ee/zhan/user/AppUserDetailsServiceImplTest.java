@@ -1,5 +1,6 @@
 package ee.zhan.user;
 
+import ee.zhan.common.security.AppUserDetailsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

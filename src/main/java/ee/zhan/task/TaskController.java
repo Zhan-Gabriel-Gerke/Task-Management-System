@@ -4,7 +4,7 @@ import ee.zhan.task.dto.CreateTaskCommand;
 import ee.zhan.task.dto.CreateTaskRequest;
 import ee.zhan.task.dto.TaskSummaryResponse;
 import ee.zhan.task.mapper.TaskWebMapper;
-import ee.zhan.user.AppUserAdapter;
+import ee.zhan.common.security.AppUserAdapter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
