@@ -1,5 +1,6 @@
 package ee.zhan.task;
 
+import ee.zhan.common.BaseControllerTest;
 import ee.zhan.task.dto.*;
 import ee.zhan.task.exception.TaskNotFoundException;
 import ee.zhan.task.mapper.TaskWebMapper;
@@ -8,14 +9,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,19 +21,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TaskController.class)
 @Import(SecurityConfig.class)
-class TaskControllerTest {
+class TaskControllerTest extends BaseControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockitoBean
-    private TaskWebMapper taskWebMapper;
-
-    @MockitoBean
-    private TaskService taskService;
+    @MockitoBean private TaskWebMapper taskWebMapper;
+    @MockitoBean private TaskService taskService;
 
     private CreateTaskRequest createTaskRequest;
 

@@ -1,18 +1,18 @@
 package ee.zhan.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.zhan.auth.dto.RegistrationRequest;
+import ee.zhan.auth.jwt.JwtService;
+import ee.zhan.common.BaseControllerTest;
 import ee.zhan.common.security.SecurityConfig;
 import ee.zhan.common.security.AppUserDetailsServiceImpl;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,12 +20,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AuthController.class)
 @Import(SecurityConfig.class)
-class AuthControllerTest {
+class AuthControllerTest extends BaseControllerTest {
 
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
     @MockitoBean private AuthService service;
-    @MockitoBean private AppUserDetailsServiceImpl userDetailsService;
+    @MockitoBean private JwtService jwtService;
+    @MockitoBean private AuthenticationManager authenticationManager;
 
     @Test
     void register_ShouldBePublic() throws Exception {
