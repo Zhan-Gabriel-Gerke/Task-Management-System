@@ -19,11 +19,18 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    @Value("${application.security.jwt.secret-key}")
-    private String secretKey;
+    //@Value("${application.security.jwt.secret-key}")
+    private final String secretKey;
+    //@Value("${application.security.jwt.expiration}")
+    private final long jwtExpiration;
 
-    @Value("${application.security.jwt.expiration}")
-    private long jwtExpiration;
+    public JwtService(
+            @Value("${application.security.jwt.secret-key}") String secretKey,
+            @Value("${application.security.jwt.expiration}") long jwtExpiration
+    ) {
+        this.secretKey = secretKey;
+        this.jwtExpiration = jwtExpiration;
+    }
 
     //get username/email from token
     public String extractUsername(String token) {
