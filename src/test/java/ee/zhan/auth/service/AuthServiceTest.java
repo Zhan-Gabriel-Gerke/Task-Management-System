@@ -1,9 +1,9 @@
-package ee.zhan.auth;
+package ee.zhan.auth.service;
 
 import ee.zhan.auth.dto.RegistrationRequest;
-import ee.zhan.user.AppUserEntity;
+import ee.zhan.user.entity.AppUserEntity;
 import ee.zhan.auth.exceptions.EmailAlreadyExists;
-import ee.zhan.user.AppUserRepository;
+import ee.zhan.user.repository.AppUserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,17 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
-    @Mock
-    private AppUserRepository repository;
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @InjectMocks
-    private AuthService service;
-
-    @Captor
-    private ArgumentCaptor<AppUserEntity> userCaptor;
-
+    @Mock private AppUserRepository repository;
+    @Mock private PasswordEncoder passwordEncoder;
+    @InjectMocks private AuthService service;
+    @Captor private ArgumentCaptor<AppUserEntity> userCaptor;
     private RegistrationRequest request;
 
     @BeforeEach

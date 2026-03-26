@@ -1,10 +1,10 @@
-package ee.zhan.auth;
+package ee.zhan.auth.controller;
 
 import ee.zhan.auth.dto.RegistrationRequest;
 import ee.zhan.auth.jwt.JwtService;
+import ee.zhan.auth.service.AuthService;
 import ee.zhan.common.BaseControllerTest;
 import ee.zhan.common.security.SecurityConfig;
-import ee.zhan.common.security.AppUserDetailsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 

@@ -1,4 +1,4 @@
-package ee.zhan.task.exception;
+package ee.zhan.task.exceptions;
 
 import ee.zhan.common.exceptions.AppException;
 import org.springframework.http.HttpStatus;

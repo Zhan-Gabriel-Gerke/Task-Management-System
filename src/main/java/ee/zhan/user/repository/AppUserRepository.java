@@ -1,5 +1,6 @@
-package ee.zhan.user;
+package ee.zhan.user.repository;
 
+import ee.zhan.user.entity.AppUserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,9 +1,9 @@
 package ee.zhan.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ee.zhan.task.TaskService;
-import ee.zhan.user.AppUserRepository;
-import ee.zhan.task.TaskRepository;
+import ee.zhan.task.service.TaskService;
+import ee.zhan.user.repository.AppUserRepository;
+import ee.zhan.task.repository.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

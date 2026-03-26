@@ -1,4 +1,4 @@
-package ee.zhan.auth;
+package ee.zhan.auth.utils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

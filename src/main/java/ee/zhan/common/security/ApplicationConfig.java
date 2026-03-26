@@ -1,6 +1,6 @@
 package ee.zhan.common.security;
 
-import ee.zhan.user.AppUserRepository;
+import ee.zhan.user.repository.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

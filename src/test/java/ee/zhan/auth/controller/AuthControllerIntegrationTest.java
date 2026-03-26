@@ -1,9 +1,8 @@
-package ee.zhan.auth;
+package ee.zhan.auth.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import ee.zhan.auth.dto.RegistrationRequest;
 import ee.zhan.common.AbstractIntegrationTest;
-import ee.zhan.user.AppUserEntity;
+import ee.zhan.user.entity.AppUserEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

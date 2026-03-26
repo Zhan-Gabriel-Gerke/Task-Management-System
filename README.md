@@ -14,5 +14,5 @@ This project is a RESTful task management system designed to handle user account
 
 - [x] **Build a REST API:** Basic CRUD operations for accounts.
 - [x] **Input Validation:** Strict rules with custom error handling.
-- [ ] **Secure Authentication:** Migrate from Basic Auth to JWT (Stateless).
-- [ ] **Advanced Database Operations:** Complex queries and views.
+- [x] **Secure Authentication:** Migrate from Basic Auth to JWT (Stateless).
+- [x] **Advanced Database Operations:** Complex queries and views.

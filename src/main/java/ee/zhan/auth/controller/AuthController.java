@@ -1,9 +1,10 @@
-package ee.zhan.auth;
+package ee.zhan.auth.controller;
 
 import ee.zhan.auth.dto.AuthenticationResponse;
 import ee.zhan.auth.dto.LoginRequest;
 import ee.zhan.auth.exceptions.AuthenticationFailedException;
 import ee.zhan.auth.jwt.JwtService;
+import ee.zhan.auth.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -8,9 +8,7 @@ import lombok.Setter;
 @Setter
 public class CreateTaskRequest {
 
-    @NotBlank
-    private String title;
-
-    @NotBlank
-    private String description;
+    @NotBlank private String title;
+    @NotBlank private String description;
+    private String assigneeEmail;
 }

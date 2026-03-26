@@ -3,6 +3,7 @@ package ee.zhan.common.exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Handle custom application exceptions
     @ExceptionHandler(AppException.class)
     public ResponseEntity<AppErrorResponse> handleAppException(
             AppException ex,
@@ -29,9 +31,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, status);
     }
 
-    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    // Handle validation errors
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<AppErrorResponse> handleValidation(
-            org.springframework.web.bind.MethodArgumentNotValidException ex,
+            MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.BAD_REQUEST;

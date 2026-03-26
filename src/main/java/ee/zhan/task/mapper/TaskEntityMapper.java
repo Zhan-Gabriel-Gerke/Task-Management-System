@@ -2,8 +2,8 @@ package ee.zhan.task.mapper;
 
 
 import ee.zhan.task.dto.CreateTaskCommand;
-import ee.zhan.user.AppUserEntity;
-import ee.zhan.task.TaskEntity;
+import ee.zhan.user.entity.AppUserEntity;
+import ee.zhan.task.entity.TaskEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.mapstruct.Mapper;
@@ -20,9 +20,11 @@ public abstract class TaskEntityMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "author", source = "authorId")
+    @Mapping(target = "assignee", ignore = true)
+
     public abstract TaskEntity toEntity(CreateTaskCommand command);
 
-    protected AppUserEntity mapUserIdToEntity(Long authorId) {
+    protected AppUserEntity mapAuthorIdToEntity(Long authorId) {
         if (authorId == null) {
             return null;
         }

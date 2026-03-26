@@ -1,4 +1,4 @@
-package ee.zhan.task;
+package ee.zhan.task.entity;
 
 public enum TaskStatus {
     CREATED,

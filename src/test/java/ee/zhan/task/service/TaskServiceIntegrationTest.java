@@ -1,9 +1,10 @@
-package ee.zhan.task;
+package ee.zhan.task.service;
 
 import ee.zhan.common.AbstractIntegrationTest;
 import ee.zhan.task.dto.CreateTaskCommand;
 import ee.zhan.task.dto.TaskSummaryResponse;
-import ee.zhan.user.AppUserEntity;
+import ee.zhan.task.entity.TaskEntity;
+import ee.zhan.user.entity.AppUserEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

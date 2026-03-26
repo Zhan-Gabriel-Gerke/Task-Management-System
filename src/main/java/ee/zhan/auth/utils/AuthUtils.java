@@ -1,4 +1,4 @@
-package ee.zhan.auth;
+package ee.zhan.auth.utils;
 
 import java.util.Locale;
 

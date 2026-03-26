@@ -1,6 +1,6 @@
 package ee.zhan.task.dto;
 
-import ee.zhan.task.TaskStatus;
+import ee.zhan.task.entity.TaskStatus;
 import lombok.Data;
 
 @Data
@@ -10,5 +10,6 @@ public class TaskSummaryResponse {
     private String title;
     private String description;
     private TaskStatus status;
-    private AuthorDto author;
+    private UserDto author;
+    private UserDto assignee;
 }

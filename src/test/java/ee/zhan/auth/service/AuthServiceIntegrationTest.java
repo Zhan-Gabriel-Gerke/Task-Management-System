@@ -1,8 +1,8 @@
-package ee.zhan.auth;
+package ee.zhan.auth.service;
 
 import ee.zhan.common.AbstractIntegrationTest;
 import ee.zhan.auth.dto.RegistrationRequest;
-import ee.zhan.user.AppUserEntity;
+import ee.zhan.user.entity.AppUserEntity;
 import ee.zhan.auth.exceptions.EmailAlreadyExists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

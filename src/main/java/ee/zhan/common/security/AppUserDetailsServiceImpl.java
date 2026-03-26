@@ -1,12 +1,12 @@
 package ee.zhan.common.security;
 
-import ee.zhan.user.AppUserEntity;
-import ee.zhan.user.AppUserRepository;
+import ee.zhan.user.entity.AppUserEntity;
+import ee.zhan.user.repository.AppUserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ee.zhan.auth.AuthUtils;
+import ee.zhan.auth.utils.AuthUtils;
 
 @Service
 public class AppUserDetailsServiceImpl implements UserDetailsService {

@@ -1,6 +1,8 @@
 package ee.zhan.user;
 
 import ee.zhan.common.security.AppUserDetailsServiceImpl;
+import ee.zhan.user.entity.AppUserEntity;
+import ee.zhan.user.repository.AppUserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -9,4 +9,5 @@ public class CreateTaskCommand {
     private String title;
     private String description;
     private Long authorId;
+    private String assigneeEmail;
 }

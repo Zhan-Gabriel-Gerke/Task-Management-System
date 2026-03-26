@@ -1,4 +1,4 @@
-package ee.zhan.user;
+package ee.zhan.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
