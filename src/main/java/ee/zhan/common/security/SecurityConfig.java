@@ -39,8 +39,10 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api/tasks").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/tasks").authenticated()
+
                         .requestMatchers(HttpMethod.GET, "/api/tasks/**").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/api/tasks/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/tasks/**").authenticated()
 
                         .anyRequest().denyAll()
                 )

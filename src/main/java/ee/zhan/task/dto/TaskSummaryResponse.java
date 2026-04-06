@@ -12,4 +12,5 @@ public class TaskSummaryResponse {
     private TaskStatus status;
     private UserDto author;
     private UserDto assignee;
+    private int comments;
 }

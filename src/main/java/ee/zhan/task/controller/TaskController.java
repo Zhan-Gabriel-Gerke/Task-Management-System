@@ -4,6 +4,7 @@ import ee.zhan.task.service.TaskService;
 import ee.zhan.task.dto.*;
 import ee.zhan.task.mapper.TaskWebMapper;
 import ee.zhan.common.security.AppUserAdapter;
+import jakarta.servlet.ServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,14 +30,14 @@ public class TaskController {
             @AuthenticationPrincipal AppUserAdapter userAdapter
     ) {
         CreateTaskCommand command = taskWebMapper.toCommand(request, userAdapter);
-        TaskSummaryResponse response = taskService.create(command);
+        TaskSummaryResponse response = taskService.createTask(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")//Endpoint for getting task by id.
     // Only authenticated users can create a task.
     public ResponseEntity<TaskSummaryResponse> getTaskById(@PathVariable Long id) {
-        return ResponseEntity.ok(taskService.getById(id));
+        return ResponseEntity.ok(taskService.getTaskById(id));
     }
 
     @GetMapping//Endpoint for getting tasks.
@@ -57,7 +58,7 @@ public class TaskController {
             @Valid @RequestBody UpdateTaskStatus request,
             @AuthenticationPrincipal AppUserAdapter userAdapter) {
 
-        TaskSummaryResponse response = taskService.updateStatus(id, request.getStatus(), userAdapter.getId());
+        TaskSummaryResponse response = taskService.updateTaskStatus(id, request.getStatus(), userAdapter.getId());
         return ResponseEntity.ok(response);
     }
 
@@ -68,8 +69,27 @@ public class TaskController {
             @RequestBody UpdateTaskAssignee request,
             @AuthenticationPrincipal AppUserAdapter userAdapter) {
 
-        TaskSummaryResponse response = taskService.updateAssignee(id, request.getAssigneeEmail(), userAdapter.getId());
+        TaskSummaryResponse response = taskService.updateTaskAssignee(id, request.getAssigneeEmail(), userAdapter.getId());
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("{id}/comments")
+    public ResponseEntity<HttpStatus> createTaskComment(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateTaskComment request,
+            @AuthenticationPrincipal AppUserAdapter userAdapter) {
+
+        taskService.createTaskComment(request.text(), id, userAdapter.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("{id}/comments")
+    public ResponseEntity<Page<TaskCommentRespond>> getTaskComment(
+            @PathVariable Long id,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+
+        Page<TaskCommentRespond> respond = taskService.getTaskComments(id, pageable);
+        return ResponseEntity.ok(respond);
     }
 }
 

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 public class TaskServiceIntegrationTest extends AbstractIntegrationTest {
 
-    private AppUserEntity createAppUserEntity() {
+    private AppUserEntity createTaskAppUserEntity() {
         AppUserEntity appUserEntity = new AppUserEntity();
         appUserEntity.setEmail(generateUniqueEmail());
         appUserEntity.setPassword("SomeCoolPassword123!");
@@ -18,16 +18,16 @@ public class TaskServiceIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void shouldCreateTask() {
+    void shouldCreateTaskTask() {
         // Arrange
-        AppUserEntity user = createAppUserEntity();
+        AppUserEntity user = createTaskAppUserEntity();
         CreateTaskCommand createTaskCommand = new CreateTaskCommand();
         createTaskCommand.setTitle("title");
         createTaskCommand.setDescription("description");
         createTaskCommand.setAuthorId(user.getId());
 
         // Act & Assert
-        TaskSummaryResponse response = taskService.create(createTaskCommand);
+        TaskSummaryResponse response = taskService.createTask(createTaskCommand);
         transactionTemplate.execute(status -> {
             TaskEntity savedTask = taskRepository.findById(response.getId()).orElseThrow();
             Assertions.assertNotNull(savedTask);

@@ -1,14 +1,18 @@
 package ee.zhan.task.service;
 
+import ee.zhan.task.dto.TaskCommentRespond;
 import ee.zhan.task.entity.TaskStatus;
 import ee.zhan.task.dto.CreateTaskCommand;
 import ee.zhan.task.dto.TaskSummaryResponse;
 import ee.zhan.task.entity.TaskEntity;
+import ee.zhan.task.entity.TasksCommentsEntity;
 import ee.zhan.task.exceptions.AccessDenied;
 import ee.zhan.task.exceptions.TaskNotFoundException;
 import ee.zhan.task.exceptions.UserWasNotFound;
+import ee.zhan.task.mapper.TaskCommentRespondMapper;
 import ee.zhan.task.mapper.TaskEntityMapper;
 import ee.zhan.task.mapper.TaskSummaryMapper;
+import ee.zhan.task.repository.TaskCommentRepository;
 import ee.zhan.task.repository.TaskRepository;
 import ee.zhan.user.entity.AppUserEntity;
 import ee.zhan.user.repository.AppUserRepository;
@@ -19,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static ee.zhan.task.repository.TaskSpecifications.hasAssigneeEmail;
@@ -27,13 +32,16 @@ import static ee.zhan.task.repository.TaskSpecifications.hasAuthorEmail;
 @Service
 @RequiredArgsConstructor
 public class TaskService {
-    private final TaskRepository repository;
+    private final TaskRepository taskRepository;
     private final AppUserRepository userRepository;
     private final TaskEntityMapper taskEntityMapper;
     private final TaskSummaryMapper taskSummaryMapper;
+    private final TaskCommentRepository taskCommentRepository;
+    private final TaskCommentRespondMapper taskCommentRespondMapper;
+
 
     @Transactional
-    public TaskSummaryResponse create(CreateTaskCommand command) {
+    public TaskSummaryResponse createTask(CreateTaskCommand command) {
         TaskEntity entity = taskEntityMapper.toEntity(command);
 
         if (command.getAssigneeEmail() != null) {
@@ -42,12 +50,12 @@ public class TaskService {
             entity.setAssignee(assignee);
         }
 
-        entity = repository.save(entity);
+        entity = taskRepository.save(entity);
         return taskSummaryMapper.toSummaryResponse(entity);
     }
 
-    public TaskSummaryResponse getById(Long id) {
-        Optional<TaskEntity> entity = repository.findById(id);
+    public TaskSummaryResponse getTaskById(Long id) {
+        Optional<TaskEntity> entity = taskRepository.findById(id);
         if (entity.isEmpty()) {
             throw new TaskNotFoundException();
         }
@@ -59,14 +67,14 @@ public class TaskService {
                 hasAuthorEmail(author),
                 hasAssigneeEmail(assignee)
         );
-        Page<TaskEntity> tasksPage = repository.findAll(spec, pageable);
+        Page<TaskEntity> tasksPage = taskRepository.findAll(spec, pageable);
         return tasksPage.map(taskSummaryMapper::toSummaryResponse);
     }
 
     @Transactional
-    public TaskSummaryResponse updateStatus(Long taskId, TaskStatus newStatus, Long userId) {
+    public TaskSummaryResponse updateTaskStatus(Long taskId, TaskStatus newStatus, Long userId) {
         //Get task from database
-        TaskEntity task = repository.findById(taskId)
+        TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(TaskNotFoundException::new);
 
         //Check if user is author or assignee of the task
@@ -90,9 +98,9 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskSummaryResponse updateAssignee(Long taskId, String userEmail, Long userId) {
+    public TaskSummaryResponse updateTaskAssignee(Long taskId, String userEmail, Long userId) {
         //Get task from database
-        TaskEntity task = repository.findById(taskId)
+        TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(TaskNotFoundException::new);
 
         //Check if user is author of the task
@@ -123,4 +131,37 @@ public class TaskService {
         task.setAssignee(assignee);
         return taskSummaryMapper.toSummaryResponse(task);
     }
+
+    @Transactional
+    public void createTaskComment(String text, Long taskId, Long authorId) {
+
+        //Get task and author from database
+        TaskEntity task = taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        AppUserEntity author = userRepository.findById(authorId).orElseThrow(() -> new UserWasNotFound("User was not wound"));
+
+        //Create new comment and save to database
+        TasksCommentsEntity entity = new TasksCommentsEntity();
+        entity.setText(text);
+        entity.setTask(task);
+        entity.setAuthor(author);
+        taskCommentRepository.save(entity);
+
+        //Update task comments count
+        task.setComments(task.getComments() + 1);
+        taskRepository.save(task);
+    }
+
+    @Transactional
+    public Page<TaskCommentRespond> getTaskComments(Long taskId, Pageable pageable) {
+        //Get task from database if we cannot find it throw an exception
+        TaskEntity task = taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+
+        //Get comments from database
+        Page<TasksCommentsEntity> entities = taskCommentRepository.findAllByTaskId(taskId, pageable);
+
+        //Map comments to response
+        return entities.map(taskCommentRespondMapper::toRespond);
+
+    }
+
 }

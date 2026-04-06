@@ -21,6 +21,7 @@ public abstract class TaskEntityMapper {
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "author", source = "authorId")
     @Mapping(target = "assignee", ignore = true)
+    @Mapping(target = "comments", constant = "0")
 
     public abstract TaskEntity toEntity(CreateTaskCommand command);
 

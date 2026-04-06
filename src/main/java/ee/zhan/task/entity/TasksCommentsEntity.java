@@ -9,27 +9,21 @@ import lombok.ToString;
 @Getter
 @Setter
 @Entity
-
-public class TaskEntity {
+public class TasksCommentsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
-    private String title;
-    private String description;
 
-    @Enumerated(EnumType.STRING)
-    private TaskStatus status = TaskStatus.CREATED;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", nullable = false)
+    private TaskEntity task;
+
+    private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     @ToString.Exclude
     private AppUserEntity author;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private AppUserEntity assignee;
-
-    private int comments;
 }

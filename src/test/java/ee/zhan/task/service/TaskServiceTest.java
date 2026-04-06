@@ -12,6 +12,8 @@ import ee.zhan.user.entity.AppUserEntity;
 import ee.zhan.task.mapper.TaskEntityMapper;
 import ee.zhan.task.mapper.TaskSummaryMapper;
 import ee.zhan.user.repository.AppUserRepository;
+import ee.zhan.task.entity.TasksCommentsEntity;
+import ee.zhan.task.repository.TaskCommentRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,12 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import ee.zhan.task.dto.TaskCommentRespond;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +43,9 @@ public class TaskServiceTest {
     @Captor private ArgumentCaptor<TaskEntity> taskCaptor;
     @Spy private TaskSummaryMapper taskSummaryMapper = Mappers.getMapper(TaskSummaryMapper.class);
     @Mock private TaskEntityMapper taskEntityMapper;
+    @Mock private TaskCommentRepository taskCommentRepository;
+    @Mock private ee.zhan.task.mapper.TaskCommentRespondMapper taskCommentRespondMapper;
+    @Captor private ArgumentCaptor<TasksCommentsEntity> commentCaptor;
     private CreateTaskCommand createTaskCommand;
 
     private final Long TASK_ID = 1L;
@@ -42,7 +53,7 @@ public class TaskServiceTest {
     private final Long ASSIGNEE_ID = 200L;
     private final Long HACKER_ID = 999L;
 
-    private TaskEntity createMockTask() {
+    private TaskEntity createTaskMockTask() {
         AppUserEntity author = new AppUserEntity();
         author.setId(AUTHOR_ID);
 
@@ -82,7 +93,7 @@ public class TaskServiceTest {
         Mockito.when(taskRepository.findById(idOfTask)).thenReturn(Optional.of(entity));
 
         //Act
-        TaskSummaryResponse response = taskService.getById(idOfTask);
+        TaskSummaryResponse response = taskService.getTaskById(idOfTask);
 
         //Assert
         Assertions.assertNotNull(response);
@@ -101,11 +112,11 @@ public class TaskServiceTest {
 
         //Act && Assert
         Assertions.assertThrows(TaskNotFoundException.class, () ->
-                taskService.getById(idOfTask));
+                taskService.getTaskById(idOfTask));
     }
 
     @Test
-    void shouldCreateTask_whenGivenValidDataAndAuth() {
+    void shouldCreateTaskTask_whenGivenValidDataAndAuth() {
         //Given
         AppUserEntity user = new AppUserEntity();
         user.setId(1L);
@@ -122,7 +133,7 @@ public class TaskServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         //When
-        TaskSummaryResponse respond = taskService.create(createTaskCommand);
+        TaskSummaryResponse respond = taskService.createTask(createTaskCommand);
 
         //Then
         Mockito.verify(taskRepository).save(taskCaptor.capture());
@@ -141,16 +152,16 @@ public class TaskServiceTest {
     }
 
     @Test
-    void updateStatus_WhenUserIsAuthor_ShouldUpdateAndReturnResponse() {
+    void updateStatus_WhenUserIsAuthor_ShouldUpdateTaskAndReturnResponse() {
         //Arrange
-        TaskEntity task = createMockTask();
+        TaskEntity task = createTaskMockTask();
         TaskSummaryResponse mockResponse = new TaskSummaryResponse();
 
         Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
         Mockito.doReturn(mockResponse).when(taskSummaryMapper).toSummaryResponse(task);
 
         //Act
-        TaskSummaryResponse actualResponse = taskService.updateStatus(TASK_ID, TaskStatus.IN_PROGRESS, AUTHOR_ID);
+        TaskSummaryResponse actualResponse = taskService.updateTaskStatus(TASK_ID, TaskStatus.IN_PROGRESS, AUTHOR_ID);
 
         //Assert
         Assertions.assertEquals(TaskStatus.IN_PROGRESS, task.getStatus());
@@ -159,28 +170,28 @@ public class TaskServiceTest {
     }
 
     @Test
-    void updateStatus_WhenUserIsAssignee_ShouldUpdateAndReturnResponse() {
+    void updateStatus_WhenUserIsAssignee_ShouldUpdateTaskAndReturnResponse() {
         // Arrange
-        TaskEntity task = createMockTask();
+        TaskEntity task = createTaskMockTask();
         Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
         Mockito.when(taskSummaryMapper.toSummaryResponse(task)).thenReturn(new TaskSummaryResponse());
 
         // Act
-        taskService.updateStatus(TASK_ID, TaskStatus.COMPLETED, ASSIGNEE_ID);
+        taskService.updateTaskStatus(TASK_ID, TaskStatus.COMPLETED, ASSIGNEE_ID);
 
         // Assert
         Assertions.assertEquals(TaskStatus.COMPLETED, task.getStatus());
     }
 
     @Test
-    void updateStatus_WhenUserIsNeitherAuthorNorAssignee_ShouldThrowAccessDenied() {
+    void updateTaskStatus_WhenUserIsNeitherAuthorNorAssignee_ShouldThrowAccessDenied() {
         // Arrange
-        TaskEntity task = createMockTask();
+        TaskEntity task = createTaskMockTask();
         Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
 
         // Act & Assert
         AccessDenied exception = Assertions.assertThrows(AccessDenied.class,
-                () -> taskService.updateStatus(TASK_ID, TaskStatus.IN_PROGRESS, HACKER_ID));
+                () -> taskService.updateTaskStatus(TASK_ID, TaskStatus.IN_PROGRESS, HACKER_ID));
 
         Assertions.assertTrue(exception.getMessage().contains("is not author or assignee"));
         Assertions.assertEquals(TaskStatus.CREATED, task.getStatus()); // Статус не поменялся
@@ -188,9 +199,9 @@ public class TaskServiceTest {
     }
 
     @Test
-    void updateStatus_WhenStatusIsSame_ShouldNotModifyButReturnResponse() {
+    void updateStatus_WhenTaskStatusIsSame_ShouldNotModifyButReturnResponse() {
         // Arrange
-        TaskEntity task = createMockTask();
+        TaskEntity task = createTaskMockTask();
         TaskSummaryResponse mockResponse = new TaskSummaryResponse();
         Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
         Mockito.doReturn(mockResponse)
@@ -198,7 +209,7 @@ public class TaskServiceTest {
                 .toSummaryResponse(task);
 
         // Act
-        taskService.updateStatus(TASK_ID, TaskStatus.CREATED, AUTHOR_ID);
+        taskService.updateTaskStatus(TASK_ID, TaskStatus.CREATED, AUTHOR_ID);
 
         // Assert
         Assertions.assertEquals(TaskStatus.CREATED, task.getStatus());
@@ -206,10 +217,10 @@ public class TaskServiceTest {
     }
 
     @Test
-    void updateAssignee_WhenUserIsAuthor_ShouldUpdateAssignee() {
+    void updateAssignee_WhenUserIsAuthor_ShouldUpdateTaskAssignee() {
         // Arrange
         String newAssigneeEmail = "new_guy@test.com";
-        TaskEntity task = createMockTask();
+        TaskEntity task = createTaskMockTask();
 
         AppUserEntity newAssignee = new AppUserEntity();
         newAssignee.setEmail(newAssigneeEmail);
@@ -219,53 +230,151 @@ public class TaskServiceTest {
         Mockito.when(taskSummaryMapper.toSummaryResponse(task)).thenReturn(new TaskSummaryResponse());
 
         // Act
-        taskService.updateAssignee(TASK_ID, newAssigneeEmail, AUTHOR_ID);
+        taskService.updateTaskAssignee(TASK_ID, newAssigneeEmail, AUTHOR_ID);
 
         // Assert
         Assertions.assertEquals(newAssignee, task.getAssignee());
     }
 
     @Test
-    void updateAssignee_WhenEmailIsNull_ShouldUnassignTask() {
+    void updateTaskAssignee_WhenEmailIsNull_ShouldUnassignTask() {
         // Arrange
-        TaskEntity task = createMockTask(); // Изначально исполнитель есть
+        TaskEntity task = createTaskMockTask();
         Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
         Mockito.when(taskSummaryMapper.toSummaryResponse(task)).thenReturn(new TaskSummaryResponse());
 
         // Act
-        taskService.updateAssignee(TASK_ID, null, AUTHOR_ID);
+        taskService.updateTaskAssignee(TASK_ID, null, AUTHOR_ID);
 
         // Assert
-        Assertions.assertNull(task.getAssignee()); // Исполнитель стерт
+        Assertions.assertNull(task.getAssignee());
         Mockito.verify(userRepository, Mockito.never()).findByEmail(Mockito.any());
     }
 
     @Test
-    void updateAssignee_WhenUserIsAssigneeButNotAuthor_ShouldThrowAccessDenied() {
+    void updateAssignee_WhenUserIsTaskAssigneeButNotAuthor_ShouldThrowAccessDenied() {
         // Arrange
-        TaskEntity task = createMockTask();
+        TaskEntity task = createTaskMockTask();
         Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
 
         // Act & Assert
         AccessDenied exception = Assertions.assertThrows(AccessDenied.class,
-                () -> taskService.updateAssignee(TASK_ID, "some@email.com", ASSIGNEE_ID));
+                () -> taskService.updateTaskAssignee(TASK_ID, "some@email.com", ASSIGNEE_ID));
 
         Assertions.assertTrue(exception.getMessage().contains("is not author"));
     }
 
     @Test
-    void updateAssignee_WhenNewAssigneeNotFound_ShouldThrowException() {
+    void updateAssignee_WhenNewTaskAssigneeNotFound_ShouldThrowException() {
         // Arrange
         String fakeEmail = "ghost@test.com";
-        TaskEntity task = createMockTask();
+        TaskEntity task = createTaskMockTask();
         Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
         Mockito.when(userRepository.findByEmail(fakeEmail)).thenReturn(Optional.empty());
 
         // Act & Assert
         UserWasNotFound exception = Assertions.assertThrows(UserWasNotFound.class,
-                () -> taskService.updateAssignee(TASK_ID, fakeEmail, AUTHOR_ID));
+                () -> taskService.updateTaskAssignee(TASK_ID, fakeEmail, AUTHOR_ID));
 
         Assertions.assertTrue(exception.getMessage().contains(fakeEmail));
-        Assertions.assertNotEquals(fakeEmail, task.getAssignee().getEmail()); // Убеждаемся, что старый не стерся
+        Assertions.assertNotEquals(fakeEmail, task.getAssignee().getEmail());
+    }
+
+    @Test
+    void createTaskComment_WithValidData_ShouldSaveCommentAndIncrementTaskCommentCount() {
+        // Arrange
+        String text = "Wow! Unbelievable!";
+        TaskEntity task = createTaskMockTask();
+        task.setComments(0);
+
+        AppUserEntity author = new AppUserEntity();
+        author.setId(AUTHOR_ID);
+
+        Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
+        Mockito.when(userRepository.findById(AUTHOR_ID)).thenReturn(Optional.of(author));
+
+        // Act
+        taskService.createTaskComment(text, TASK_ID, AUTHOR_ID);
+
+        // Assert
+        Mockito.verify(taskCommentRepository).save(commentCaptor.capture());
+        TasksCommentsEntity savedComment = commentCaptor.getValue();
+
+        assertEquals(text, savedComment.getText());
+        assertEquals(task, savedComment.getTask());
+        assertEquals(author, savedComment.getAuthor());
+
+        assertEquals(1, task.getComments());
+        Mockito.verify(taskRepository).save(task);
+    }
+
+    @Test
+    void createTaskComment_WhenTaskNotFound_ShouldThrowTaskNotFoundException() {
+        // Arrange
+        Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        Assertions.assertThrows(TaskNotFoundException.class,
+                () -> taskService.createTaskComment("text", TASK_ID, AUTHOR_ID));
+
+        Mockito.verify(taskCommentRepository, Mockito.never()).save(any());
+        Mockito.verify(taskRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    void createTaskComment_WhenAuthorNotFound_ShouldThrowUserWasNotFound() {
+        // Arrange
+        TaskEntity task = createTaskMockTask();
+        Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
+        Mockito.when(userRepository.findById(AUTHOR_ID)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        UserWasNotFound exception = Assertions.assertThrows(UserWasNotFound.class,
+                () -> taskService.createTaskComment("text", TASK_ID, AUTHOR_ID));
+
+        Assertions.assertEquals("User was not wound", exception.getMessage());
+        Mockito.verify(taskCommentRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    void getTaskComments_WhenGivenTaskId_ShouldReturnPageOfComments() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+        TaskEntity task = createTaskMockTask();
+        
+        TasksCommentsEntity commentEntity = new TasksCommentsEntity();
+        commentEntity.setId(1L);
+        commentEntity.setText("Test comment");
+        commentEntity.setTask(task);
+        commentEntity.setAuthor(task.getAuthor());
+
+        Page<TasksCommentsEntity> mockPage = new PageImpl<>(List.of(commentEntity), pageable, 1);
+        TaskCommentRespond expectedRespond = new TaskCommentRespond(1L, TASK_ID, "Test comment", "author@test.com");
+
+        Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.of(task));
+        Mockito.when(taskCommentRepository.findAllByTaskId(TASK_ID, pageable)).thenReturn(mockPage);
+        Mockito.when(taskCommentRespondMapper.toRespond(commentEntity)).thenReturn(expectedRespond);
+
+        // Act
+        Page<TaskCommentRespond> result = taskService.getTaskComments(TASK_ID, pageable);
+
+        // Assert
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.getTotalElements());
+        Assertions.assertEquals("Test comment", result.getContent().get(0).text());
+        Assertions.assertEquals("author@test.com", result.getContent().get(0).authorEmail());
+    }
+
+    @Test
+    void getTaskComments_WhenTaskNotFound_ShouldThrowTaskNotFoundException() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+        Mockito.when(taskRepository.findById(TASK_ID)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        Assertions.assertThrows(TaskNotFoundException.class, 
+                () -> taskService.getTaskComments(TASK_ID, pageable));
+        
+        Mockito.verify(taskCommentRepository, Mockito.never()).findAllByTaskId(any(), any());
     }
 }

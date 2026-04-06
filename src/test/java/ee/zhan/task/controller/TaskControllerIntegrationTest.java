@@ -10,6 +10,7 @@ import ee.zhan.task.entity.TaskEntity;
 import ee.zhan.task.entity.TaskStatus;
 import ee.zhan.user.entity.AppUserEntity;
 import org.junit.jupiter.api.Assertions;
+import ee.zhan.task.dto.CreateTaskComment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -354,5 +355,65 @@ public class TaskControllerIntegrationTest extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testCreateComment_WhenValidRequest_ShouldReturnCreatedAndPersistInDb() throws Exception {
+        // Arrange
+        TaskEntity task = createTestTask("Task with comments", author);
+        var request = new CreateTaskComment("First comment!");
+
+        // Act
+        mockMvc.perform(post("/api/tasks/" + task.getId() + "/comments")
+                        .with(user(authorAdapter))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        // Assert
+        TaskEntity updatedTask = taskRepository.findById(task.getId()).get();
+        Assertions.assertEquals(1, updatedTask.getComments());
+
+        var comments = taskCommentRepository.findAll();
+        Assertions.assertEquals(1, comments.size());
+        Assertions.assertEquals("First comment!", comments.get(0).getText());
+        Assertions.assertEquals(author.getId(), comments.get(0).getAuthor().getId());
+        Assertions.assertEquals(task.getId(), comments.get(0).getTask().getId());
+    }
+
+    @Test
+    void testCreateComment_WhenTaskNotFound_ShouldReturnNotFound() throws Exception {
+        // Arrange
+        var request = new CreateTaskComment("Nice task!");
+
+        // Act & Assert
+        mockMvc.perform(post("/api/tasks/999/comments")
+                        .with(user(authorAdapter))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetTaskComments_WhenGivenTaskId_ShouldReturnPageOfComments() throws Exception {
+        // Arrange
+        TaskEntity task = createTestTask("Task for getting comments", author);
+        var createParam = new CreateTaskComment("My first comment");
+        mockMvc.perform(post("/api/tasks/" + task.getId() + "/comments")
+                        .with(user(authorAdapter))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createParam)))
+                .andExpect(status().isCreated());
+
+        // Act & Assert
+        mockMvc.perform(get("/api/tasks/" + task.getId() + "/comments")
+                        .with(user(authorAdapter))
+                        .param("page", "0")
+                        .param("size", "10")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].text").value("My first comment"))
+                .andExpect(jsonPath("$.content[0].authorEmail").value(author.getEmail()))
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 }

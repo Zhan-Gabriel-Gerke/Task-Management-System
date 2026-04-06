@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.zhan.task.service.TaskService;
 import ee.zhan.user.repository.AppUserRepository;
 import ee.zhan.task.repository.TaskRepository;
+import ee.zhan.task.repository.TaskCommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,12 +26,14 @@ public abstract class AbstractIntegrationTest {
     @Autowired protected TaskService taskService;
     @Autowired protected TaskRepository taskRepository;
     @Autowired protected AppUserRepository appUserRepository;
+    @Autowired protected TaskCommentRepository taskCommentRepository;
     @Autowired protected TransactionTemplate transactionTemplate;
     @Autowired protected MockMvc mockMvc;
     @Autowired protected ObjectMapper objectMapper;
 
     @BeforeEach
     void globalSetUp() {
+        taskCommentRepository.deleteAll();
         taskRepository.deleteAll();
         appUserRepository.deleteAll();
     }

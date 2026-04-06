@@ -84,7 +84,7 @@ class TaskControllerTest extends BaseControllerTest {
         mockResponse.getAuthor().setId(1L);
         mockResponse.getAuthor().setEmail("email");
 
-        Mockito.when(taskService.getById(1L)).thenReturn(mockResponse);
+        Mockito.when(taskService.getTaskById(1L)).thenReturn(mockResponse);
 
         //Act
         String content = mockMvc.perform(get("/api/tasks/1")
@@ -107,7 +107,7 @@ class TaskControllerTest extends BaseControllerTest {
 
     @Test
     void shouldReturn404WhenTaskNotFound() throws Exception {
-        Mockito.when(taskService.getById(999L)).thenThrow(new TaskNotFoundException());
+        Mockito.when(taskService.getTaskById(999L)).thenThrow(new TaskNotFoundException());
 
         mockMvc.perform(get("/api/tasks/999")
                 .with(user(userAdapter)))
@@ -188,7 +188,7 @@ class TaskControllerTest extends BaseControllerTest {
         TaskSummaryResponse mockResponse = new TaskSummaryResponse();
         mockResponse.setStatus(TaskStatus.IN_PROGRESS);
 
-        Mockito.when(taskService.updateStatus(eq(taskId), eq(TaskStatus.IN_PROGRESS), any()))
+        Mockito.when(taskService.updateTaskStatus(eq(taskId), eq(TaskStatus.IN_PROGRESS), any()))
                 .thenReturn(mockResponse);
 
         // Act & Assert
@@ -212,7 +212,7 @@ class TaskControllerTest extends BaseControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(taskService, Mockito.never()).updateStatus(any(), any(), any());
+        Mockito.verify(taskService, Mockito.never()).updateTaskStatus(any(), any(), any());
     }
 
     @Test
@@ -227,7 +227,7 @@ class TaskControllerTest extends BaseControllerTest {
         TaskSummaryResponse mockResponse = new TaskSummaryResponse();
         mockResponse.setTitle("Title");
 
-        Mockito.when(taskService.updateAssignee(eq(taskId), eq(newAssigneeEmail), any()))
+        Mockito.when(taskService.updateTaskAssignee(eq(taskId), eq(newAssigneeEmail), any()))
                 .thenReturn(mockResponse);
 
         // Act & Assert
@@ -239,4 +239,85 @@ class TaskControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.title").value("Title"));
     }
 
-}
+    @Test
+    void testCreateComment_WithValidRequest_ShouldReturnCreated() throws Exception {
+        // Arrange
+        Long taskId = 1L;
+        CreateTaskComment request = new CreateTaskComment("Nice task!");
+
+        // Act & Assert
+        mockMvc.perform(post("/api/tasks/{id}/comments", taskId)
+                        .with(user(userAdapter))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        Mockito.verify(taskService).createTaskComment(eq("Nice task!"), eq(taskId), eq(userAdapter.getId()));
+    }
+
+    @Test
+    void testCreateComment_WithoutAuth_ShouldReturnUnauthorized() throws Exception {
+        // Arrange
+        Long taskId = 1L;
+        CreateTaskComment request = new CreateTaskComment("Nice task!");
+
+        // Act & Assert
+        mockMvc.perform(post("/api/tasks/{id}/comments", taskId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
+
+        Mockito.verify(taskService, Mockito.never()).createTaskComment(any(), any(), any());
+    }
+
+    @Test
+    void testCreateComment_WithEmptyText_ShouldReturnBadRequest() throws Exception {
+        // Arrange
+        Long taskId = 1L;
+        CreateTaskComment request = new CreateTaskComment(""); // @NotBlank fails
+
+        // Act & Assert
+        mockMvc.perform(post("/api/tasks/{id}/comments", taskId)
+                        .with(user(userAdapter))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(taskService, Mockito.never()).createTaskComment(any(), any(), any());
+    }
+
+    @Test
+    void testGetTaskComments_WithAuth_ShouldReturnPageOfComments() throws Exception {
+        // Arrange
+        Long taskId = 1L;
+        TaskCommentRespond mockComment = new TaskCommentRespond(1L, taskId, "Test comment", "author@test.com");
+        Page<TaskCommentRespond> mockPage = new PageImpl<>(List.of(mockComment), PageRequest.of(0, 10), 1);
+
+        Mockito.when(taskService.getTaskComments(eq(taskId), any(Pageable.class)))
+                .thenReturn(mockPage);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/tasks/{id}/comments", taskId)
+                        .with(user(userAdapter))
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "id,asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].text").value("Test comment"))
+                .andExpect(jsonPath("$.content[0].authorEmail").value("author@test.com"))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void testGetTaskComments_WithoutAuth_ShouldReturnUnauthorized() throws Exception {
+        // Arrange
+        Long taskId = 1L;
+
+        // Act & Assert
+        mockMvc.perform(get("/api/tasks/{id}/comments", taskId))
+                .andExpect(status().isUnauthorized());
+
+        Mockito.verify(taskService, Mockito.never()).getTaskComments(any(), any());
+    }
+
+}
