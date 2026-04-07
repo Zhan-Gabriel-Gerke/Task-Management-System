@@ -54,3 +54,6 @@ bin/
 .env
 .env
 /htmlReport
+.idea/inspectionProfiles/Project_Default.xml
+qodana.yaml
+.idea/inspectionProfiles/Project_Default.xml
